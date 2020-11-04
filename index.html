@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        /**@type{HTMLCanvasElement}*/
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var circleList = [];
+
+        function getRandom(min, max) {
+            return Math.round(Math.random() * (max - min) + min);
+        }
+        canvas.addEventListener('mousemove', function (e) {
+            circleList.push(new Circle(e.clientX, e.clientY));
+        })
+
+        function Circle(x, y) {
+            this.x = x;//圆心横坐标
+            this.y = y;//圆心纵坐标
+            this.r = 30;//圆的半径
+            this.vx = (Math.random() - 0.5) * 3;//横向速度变化
+            this.vy = (Math.random() - 0.5) * 3;//纵向速度变化
+            this.color = `rgb(${getRandom(0, 255)},${getRandom(0, 255)},${getRandom(0, 255)})`;//随机的颜色
+            this.a = 1;//透明度
+        }
+        Circle.prototype = {
+            draw() {
+                context.beginPath();
+                context.fillStyle = this.color;
+
+                context.globalAlpha = this.a;//设置当前绘图的透明度
+                context.globalCompositeOperation = 'lighter';//
+
+                context.arc(this.x, this.y, this.r, 0, Math.PI * 2);//画圆
+                context.fill();//填充
+                this.update();//小彩球运动变化
+            },
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.r *= 0.99;
+                this.a *= 0.98;
+            }
+        }
+
+        function render() {
+            context.clearRect(0, 0, canvas.width, canvas.height);//清理画布
+            circleList.forEach(function (item, i) {
+                item.draw();
+                if(this.r < 1){
+                    this.r = 0;
+                }
+            })
+            requestAnimationFrame(render);
+        }
+        render();
+    </script>
+</body>
+
+</html>
